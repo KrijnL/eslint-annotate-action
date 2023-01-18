@@ -13,12 +13,16 @@ inputs:
     default: 'true'
     required: false
   fail-on-warning:
-    description: "Fail the GitHub Action when ESLint warnings are detected. Set to 'true' to enable."
+    description: "Fail the GitHub Action when ESLint warnings are detected. Set to 'true' to enable. This setting is ignored if 'fail-on-error' is disabled."
     default: 'false'
     required: false
   check-name:
     description: "The name of the GitHub status check created."
     default: 'ESLint Report Analysis'
+    required: false
+  fail-on-error:
+    description: "Fail the Github Action when ESLint errors are detected. Set to 'false' to disable."
+    default: 'true'
     required: false
 runs:
   using: "node16"
