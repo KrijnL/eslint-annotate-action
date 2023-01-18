@@ -27,7 +27,12 @@ Toolkit.run(async (tools) => {
     await addAnnotationsToStatusCheck(annotations, checkId)
 
     // Finally, close the GitHub check as completed
-    await closeStatusCheck(conclusion, checkId, analyzedReport.summary)
+    await closeStatusCheck(
+      conclusion,
+      checkId,
+      analyzedReport.summary,
+      onlyChangedFiles ? undefined : analyzedReport.markdown,
+    )
 
     // Fail the Action if the report analysis conclusions is failure
     if (conclusion === 'failure') {
