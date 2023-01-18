@@ -19595,8 +19595,10 @@ if (areTesting) {
 }
 const onlyChangedFiles = core.getInput('only-pr-files') || 'true';
 const failOnWarningInput = core.getInput('fail-on-warning') || 'false';
+const failOnErrorInput = core.getInput('fail-on-error') || 'true';
 const checkName = core.getInput('check-name') || 'ESLint Report Analysis';
 const failOnWarning = failOnWarningInput === 'true';
+const failOnError = failOnErrorInput === 'true';
 const reportFile = areTesting
     ? 'src/__tests__/eslintReport-3-errors.json'
     : core.getInput('report-json', { required: true });
@@ -19621,6 +19623,7 @@ exports["default"] = {
     isGitHubActions,
     getTimestamp,
     failOnWarning,
+    failOnError,
 };
 
 
@@ -19910,11 +19913,35 @@ exports["default"] = getPullRequestFiles;
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const actions_toolkit_1 = __nccwpck_require__(7045);
+const core = __importStar(__nccwpck_require__(2186));
 const eslintJsonReportToJs_1 = __importDefault(__nccwpck_require__(1036));
 const getAnalyzedReport_1 = __importDefault(__nccwpck_require__(8481));
 const openStatusCheck_1 = __importDefault(__nccwpck_require__(7829));
@@ -19922,7 +19949,7 @@ const closeStatusCheck_1 = __importDefault(__nccwpck_require__(7345));
 const addAnnotationsToStatusCheck_1 = __importDefault(__nccwpck_require__(822));
 const getPullRequestChangedAnalyzedReport_1 = __importDefault(__nccwpck_require__(6474));
 const constants_1 = __importDefault(__nccwpck_require__(9042));
-const { reportFile, onlyChangedFiles } = constants_1.default;
+const { reportFile, onlyChangedFiles, failOnError } = constants_1.default;
 actions_toolkit_1.Toolkit.run(async (tools) => {
     tools.log.info(`Starting analysis of the ESLint report ${reportFile}. Standby...`);
     const reportJS = (0, eslintJsonReportToJs_1.default)(reportFile);
@@ -19932,6 +19959,9 @@ actions_toolkit_1.Toolkit.run(async (tools) => {
     const annotations = analyzedReport.annotations;
     const conclusion = analyzedReport.success ? 'success' : 'failure';
     tools.log.info(analyzedReport.summary);
+    core.setOutput('summary', analyzedReport.summary);
+    core.setOutput('errorCount', analyzedReport.errorCount);
+    core.setOutput('warningCount', analyzedReport.warningCount);
     try {
         // Create a new, in-progress status check
         const checkId = await (0, openStatusCheck_1.default)();
@@ -19940,7 +19970,7 @@ actions_toolkit_1.Toolkit.run(async (tools) => {
         // Finally, close the GitHub check as completed
         await (0, closeStatusCheck_1.default)(conclusion, checkId, analyzedReport.summary, analyzedReport.markdown);
         // Fail the Action if the report analysis conclusions is failure
-        if (conclusion === 'failure') {
+        if (failOnError && conclusion === 'failure') {
             tools.exit.failure(`${analyzedReport.errorCount} errors and ${analyzedReport.warningCount} warnings`);
             process.exit(1);
         }
