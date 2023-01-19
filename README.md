@@ -29,6 +29,7 @@ This allows for more flexibility on how ESLint is run. This action is agnostic e
 | `only-pr-files` | Only annotate files changed when run on the `pull_request` event | No | `true` |
 | `fail-on-warning` | Fail the GitHub Action when ESLint warnings are detected. Set to `true` to enable. | No | `false` |
 | `check-name` | The name of the GitHub status check created. | No | `ESLint Report Analysis` |
+| `markdown-report-on-step-summary` | Whether to show a markdown report in the step summary. | No | `false` |
 
 ## Usage Example
 

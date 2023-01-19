@@ -40,8 +40,10 @@ if (areTesting) {
 
 const onlyChangedFiles = core.getInput('only-pr-files') || 'true'
 const failOnWarningInput = core.getInput('fail-on-warning') || 'false'
+const markdownReportOnStepSummaryInput = core.getInput('markdown-report-on-step-summary') || 'false'
 const checkName = core.getInput('check-name') || 'ESLint Report Analysis'
 const failOnWarning = failOnWarningInput === 'true'
+const markdownReportOnStepSummary = markdownReportOnStepSummaryInput === 'true'
 
 const reportFile = areTesting
   ? 'src/__tests__/eslintReport-3-errors.json'
@@ -69,4 +71,5 @@ export default {
   isGitHubActions,
   getTimestamp,
   failOnWarning,
+  markdownReportOnStepSummary,
 }
