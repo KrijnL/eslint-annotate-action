@@ -32,6 +32,13 @@ This allows for more flexibility on how ESLint is run. This action is agnostic e
 | `check-name` | The name of the GitHub status check created. | No | `ESLint Report Analysis` |
 | `markdown-report-on-step-summary` | Whether to show a markdown report in the step summary. | No | `false` |
 
+## Outputs
+
+| Name | Description |
+| `summary` | A short description of the error and warning count |
+| `errorCount` | The amount of errors ESLint reported on |
+| `warningCount` | The amount of warnings ESLint reported on |
+
 ## Usage Example
 
 In `.github/workflows/nodejs.yml`:
